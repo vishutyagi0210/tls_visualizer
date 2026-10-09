@@ -5,5 +5,6 @@ import { SpeechProvider } from './components/Speech';
 import './base.css';
 import './flow.css';
 import './cinema.css';
+import './action-scene.css';
 
 createRoot(document.getElementById('root')!).render(<StrictMode><SpeechProvider><App /></SpeechProvider></StrictMode>);

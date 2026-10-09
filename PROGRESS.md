@@ -6,6 +6,7 @@
 - Public CA: six steps, including the same introduction before the server, browser, and public issuer.
 - New illustrated introduction explains digital identity, certificates, private keys, the CA, and the client's trust choice.
 - The narrated subject lifts forward while other machines fade back; desktop close-ups sit beside the network diagram.
+- The illustration area now contains playback-driven action scenes: keys appear and enter local storage; CSRs assemble and travel; signatures appear; signed certificates return; CA certificates enter the client's configured trust store. Existing audio is unchanged.
 - Separate hash routes `/#/private` and `/#/public` for static hosting.
 - No decorative stars, flower symbols, or emoji in the active interface.
 - Sub-scenes show file movement, signing, trust-store configuration, signature verification and protected traffic.
@@ -23,3 +24,5 @@ Historical page implementations, lesson data, plans and audio remain in the repo
 ## Delivery
 
 TypeScript and the production build pass. All 44 narration assets were checked against the text catalog. Headless Chrome exercised every chapter and moment on both routes at 1440, 390, and 320px without horizontal page overflow or browser exceptions. Real MP3 playback, pause/resume, speed changes, automatic beat/chapter progression, altered-certificate failure/restore, and reduced-motion transforms passed. Desktop and mobile screenshots were inspected. Subjective listening quality was not assessed; public deployment is not part of this change.
+
+Additional action-scene checks passed: narrated key creation, changing CSR coordinates with playback, signature reveal, exact frozen scene markup while paused, and preservation of the private/public trust distinction. No voice clips were regenerated for this visual-only update.

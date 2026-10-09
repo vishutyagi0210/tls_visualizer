@@ -27,6 +27,8 @@ Both journeys start with two beginner chapters: **Why identity matters** and **W
 
 The active machine lifts into a spotlight while the others recede. A close-up shows the current operation, and the focus moves from sender to receiver during file transfers. Illustrated cards reveal their details as each passage plays. Sentence highlighting is approximately paced within each audio clip, not word-level alignment. Nothing starts speaking automatically on page load.
 
+The **What is a CA?** screen now plays miniature action scenes inside the illustration area: a server sends its CSR, the CA signs, and the certificate returns. The trust scene visibly places a CA certificate into the client's trust store, then distinguishes browser/OS-supplied public roots. Later close-ups show key creation and protected storage, CSR assembly, transfers, and signing. These use the existing voice clips and playback clock; pausing freezes their positions, and reduced-motion mode uses discrete states instead of travelling objects. A signing-operation line is not a private-key transfer.
+
 - Key pairs appear locally; private keys stay with their owners.
 - CSRs and certificates travel along a visible path between machines.
 - The CA signs the server certificate; an illustrative stamp represents the digital signature.
@@ -88,6 +90,7 @@ This workflow is prepared locally; it has not changed your GitHub settings, DNS,
 | `src/App.tsx` | Separate page views, scene playback, controls and captions |
 | `src/components/FlowScene.tsx` | Animated file transfers, signing, trust and verification |
 | `src/components/FoundationScene.tsx` | Beginner-first illustrated introduction |
+| `src/components/ActionScene.tsx`, `src/action-scene.css` | Playback-driven key creation, requests, signing, transfers and trust-store scenes |
 | `src/data/flowScenes.ts` | Spoken passages and the visual action for each passage |
 | `src/base.css`, `src/flow.css`, `src/cinema.css` | Shared controls, responsive layout, close-ups and spotlight animation |
 | `src/components/Speech.tsx` | MP3 playback and narration clock |
