@@ -23,6 +23,10 @@ Hash routes work on static hosting without server rewrite rules. These are separ
 
 Select **Play with voice** to follow the entire journey. Each spoken passage drives its own visual moment using the audio playback clock. File movement pauses with narration and follows playback-speed changes.
 
+Both journeys start with two beginner chapters: **Why identity matters** and **What is a CA?** Six narrated illustrations introduce a digital ID, the private key, the certificate issuer, and the client's trust decision before showing the network diagram. The private journey has nine chapters; the public journey has six.
+
+The active machine lifts into a spotlight while the others recede. A close-up shows the current operation, and the focus moves from sender to receiver during file transfers. Illustrated cards reveal their details as each passage plays. Sentence highlighting is approximately paced within each audio clip, not word-level alignment. Nothing starts speaking automatically on page load.
+
 - Key pairs appear locally; private keys stay with their owners.
 - CSRs and certificates travel along a visible path between machines.
 - The CA signs the server certificate; an illustrative stamp represents the digital signature.
@@ -36,7 +40,7 @@ The private example follows one connection between two servers; private TLS is n
 
 ## Audio
 
-38 bundled MP3 passages, approximately 2.2 MiB total, generated with Piper’s LJ Speech narrator at a slower pace and lower volume. Standard HTML audio; no installed browser voices, backend, API keys, or external speech service.
+44 bundled MP3 passages, approximately 2.7 MiB total, generated with Piper’s LJ Speech narrator at a slower pace and lower volume. Standard HTML audio; no installed browser voices, backend, API keys, or external speech service.
 
 Page changes, manual moment selection, and hidden tabs stop narration. Playback speed changes preserve playback. Only the optional speed preference is stored locally.
 
@@ -49,7 +53,7 @@ npm run build
 npm run preview
 ```
 
-Publish all of `dist/`, including `dist/audio/`. No public deployment has been performed. The production build includes TypeScript compilation. Browser visual and audible playback checks have not been performed for this revision.
+Publish all of `dist/`, including `dist/audio/`. No public deployment has been performed. The production build includes TypeScript compilation. Headless Chrome checks cover both journeys at desktop and mobile widths, playback controls, automatic chapter transitions, and the tampering experiment. Screenshots were inspected; subjective narrator quality still deserves a listen on your own speakers before sharing.
 
 ## Deploy automatically to tls.tyagi.fun
 
@@ -83,8 +87,9 @@ This workflow is prepared locally; it has not changed your GitHub settings, DNS,
 | --- | --- |
 | `src/App.tsx` | Separate page views, scene playback, controls and captions |
 | `src/components/FlowScene.tsx` | Animated file transfers, signing, trust and verification |
+| `src/components/FoundationScene.tsx` | Beginner-first illustrated introduction |
 | `src/data/flowScenes.ts` | Spoken passages and the visual action for each passage |
-| `src/base.css`, `src/flow.css` | Shared controls, responsive layout and animation |
+| `src/base.css`, `src/flow.css`, `src/cinema.css` | Shared controls, responsive layout, close-ups and spotlight animation |
 | `src/components/Speech.tsx` | MP3 playback and narration clock |
 | `src/data/audio-manifest.json` | Narration text hashes mapped to local files |
 | `public/audio/` | Published narration and credits |

@@ -1,6 +1,20 @@
-export type SceneKind = 'intro' | 'keys' | 'request' | 'travel' | 'approve' | 'sign' | 'certificate' | 'trust' | 'prove' | 'verify' | 'checks' | 'secure' | 'domain';
+export type SceneKind = 'foundation' | 'intro' | 'keys' | 'request' | 'travel' | 'approve' | 'sign' | 'certificate' | 'trust' | 'prove' | 'verify' | 'checks' | 'secure' | 'domain';
 export type Beat = { label: string; narration: string; kind: SceneKind; focus: number; file?: string; from?: number; to?: number };
 const b = (label: string, narration: string, kind: SceneKind, focus: number, file?: string, from?: number, to?: number): Beat => ({ label, narration, kind, focus, file, from, to });
+
+// Short, separately narrated scenes give beginners one idea at a time.
+export const foundationScenes: Beat[][] = [
+  [
+    b('Before we connect, who are you?', 'Before we talk about certificates, imagine opening your bank’s website. You have reached a computer. But how do you know it is the computer you intended to reach? That is an identity question. Let’s answer it, one small piece at a time.', 'foundation', 1, 'identity'),
+    b('A certificate is a digital ID card', 'A certificate is like a digital ID card for a server. It carries the server’s name, its public key, and an expiry date. It does not contain the private key. And an ID card is only useful if you can check who issued it.', 'foundation', 1, 'id-card'),
+    b('The private key proves ownership', 'The server also keeps a private key. Think of it as a secret way to prove, this identity belongs to me. A public certificate can be copied. The private key must stay protected. During the connection, the server proves it has that key without sending the key itself.', 'foundation', 1, 'ownership'),
+  ],
+  [
+    b('CA means Certificate Authority', 'Meet the Certificate Authority, or CA. Think of an office that checks a request and signs an ID card. Its digital signature lets a client detect changes to the certificate. The picture of a stamp is just an analogy. The real signature is mathematical.', 'foundation', 0, 'authority'),
+    b('Trust is a decision by the client', 'Now look at the client, the computer starting the connection. It needs a trusted starting point. With a private CA, you install the CA certificate into the client’s trust configuration. For public websites, browsers already accept selected public roots. A certificate is not trusted just because someone sends it.', 'foundation', 2, 'trust-choice'),
+    b('Identity first. Encryption next.', 'Here is the whole story. Create a key and request a certificate. Have an authorized issuer sign it. Configure what the client trusts. Then the client checks the server, and the TLS handshake establishes encryption. Let’s slow that down and watch the actual files move.', 'foundation', 2, 'roadmap'),
+  ],
+];
 
 export const internalScenes: Beat[][] = [
   [
