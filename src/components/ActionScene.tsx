@@ -65,7 +65,9 @@ export default function ActionScene(props: Props) {
     else { action = 'secure'; p = (p - .77) / .23; }
   }
   const motion = (n: number) => reduced ? Number(n >= .5) : ease(n);
-  const names = [publicCA ? 'Public CA' : 'Your CA', 'Server', 'Client'];
+  const names = [publicCA ? 'Public CA' : 'Your CA', publicCA ? 'Server' : 'Server 2', publicCA ? 'Browser' : 'Server 1'];
+  const clientKind = publicCA ? 'client' : 'server';
+  const issuerKey = publicCA ? 'issuer.key' : 'ca.key';
   const keyName = publicCA ? 'server.key' : 'server-2.key';
   const certName = file || (publicCA ? 'server.crt' : 'server-2.crt');
   const left = 98, right = 422;
@@ -88,8 +90,8 @@ export default function ActionScene(props: Props) {
     <svg viewBox="0 0 520 365" role="img" aria-label={`${status}. ${detail}`}>
       <path className="action-guide" d="M36 365V18h448v347M36 244h448"/>
       {(action === 'keys' || action === 'request') && <>
-        <Actor x={left} kind={owner === 0 && action === 'keys' ? 'ca' : 'server'} label={action === 'request' ? 'Server' : names[owner]} active/>
-        <Drawer x={left} label={owner === 0 && action === 'keys' ? 'ca.key' : keyName} visible={action === 'request' || !createKeys || p > .64}/>
+        <Actor x={left} kind={owner === 0 && action === 'keys' ? 'ca' : 'server'} label={action === 'request' ? names[1] : names[owner]} active/>
+        <Drawer x={left} label={owner === 0 && action === 'keys' ? issuerKey : keyName} visible={action === 'request' || !createKeys || p > .64}/>
         {action === 'keys' ? <>
           <g className="action-private-key" opacity={createKeys && p > .12 && p < .7 ? 1 : 0}><Key x={left + 53 * (1 - motion((p - .32) / .32))} y={190 + motion((p - .32) / .32) * 108} scale={1.15}/></g>
           <g opacity={!createKeys || p > .17 ? 1 : .15} transform={`translate(${!createKeys ? 390 : 275 + motion((p - .25) / .4) * 115} 191)`} className="action-public-key"><Key x={0} y={0}/><text y="45" textAnchor="middle">Public key</text></g>
@@ -102,9 +104,9 @@ export default function ActionScene(props: Props) {
         </>}
       </>}
       {(action === 'travel' || action === 'sign') && <>
-        <Actor x={left} kind={action === 'travel' && from === 1 && to === 2 ? 'server' : 'ca'} label={action === 'travel' && from === 1 && to === 2 ? 'Server' : names[0]} active={action === 'sign' || (sourceX === left ? transfer < .6 : transfer >= .6)}/>
-        <Actor x={right} kind={to === 2 ? 'client' : 'server'} label={to === 2 ? 'Client' : 'Server'} active={action === 'travel' && (sourceX === right ? transfer < .6 : transfer >= .6)}/>
-        <Drawer x={left} label={from === 1 && to === 2 ? keyName : 'ca.key'}/>
+        <Actor x={left} kind={action === 'travel' && from === 1 && to === 2 ? 'server' : 'ca'} label={action === 'travel' && from === 1 && to === 2 ? names[1] : names[0]} active={action === 'sign' || (sourceX === left ? transfer < .6 : transfer >= .6)}/>
+        <Actor x={right} kind={to === 2 ? clientKind : 'server'} label={to === 2 ? names[2] : names[1]} active={action === 'travel' && (sourceX === right ? transfer < .6 : transfer >= .6)}/>
+        <Drawer x={left} label={from === 1 && to === 2 ? keyName : issuerKey}/>
         {to !== 2 && <Drawer x={right} label={keyName}/>}
         {action === 'travel' ? <>
           <path className="action-path" d={`M${sourceX} 202H${destinationX}`} strokeDasharray="5 7"/>
@@ -117,14 +119,14 @@ export default function ActionScene(props: Props) {
         </>}
       </>}
       {action === 'trust' && <>
-        <Actor x={right} kind="client" label="Client / browser" active/>
+        <Actor x={right} kind={compareTrust ? (publicTrust ? 'client' : 'server') : clientKind} label={compareTrust ? (publicTrust ? 'Browser' : 'Server 1') : names[2]} active/>
         <g className="action-trust-source"><text x={left} y="70" textAnchor="middle">{publicTrust ? 'Browser / OS policy' : 'You / administrator'}</text><text x={left} y="94" textAnchor="middle" className="document-detail">{publicTrust ? 'PUBLIC ROOTS' : 'PRIVATE CA'}</text></g>
         <g className="action-trust-store"><rect x="324" y="229" width="172" height="112" rx="12"/><text x="410" y="250" textAnchor="middle">Trusted CA store</text><text x="410" y="332" textAnchor="middle" className="document-detail">{trustProgress > .8 ? '✓ Explicitly accepted' : 'Trust is a local choice'}</text></g>
         <path className="action-path" d="M98 180Q260 130 411 286" strokeDasharray="5 7"/>
         {(() => { const t = motion((trustProgress - .22) / .55); return <Card x={left + t * 312} y={180 + t * 111 - (reduced ? 0 : Math.sin(t * Math.PI) * 32)} name={publicTrust ? 'Public root' : 'ca.crt'} scale={1 - t * .35}/>; })()}
       </>}
       {action === 'secure' && <>
-        <Actor x={left} kind="server" label="Server" active={p > .55}/><Actor x={right} kind="client" label="Client" active/>
+        <Actor x={left} kind="server" label={names[1]} active={p > .55}/><Actor x={right} kind={clientKind} label={names[2]} active/>
         <path className="action-path" d="M98 220H422"/>
         {p < .55 ? <Card x={left + motion(p / .5) * 324} y={211} name={`${exampleServer}.crt`} signed/> : <>
           <g className="action-protected" transform={`translate(${left + motion((p - .55) / .45) * 324} 220)`}><rect x="-38" y="-22" width="76" height="44" rx="8"/><path d="M-8-3v-7a8 8 0 0 1 16 0v7m-19 0h22v17h-22Z"/></g>

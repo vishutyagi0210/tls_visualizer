@@ -26,3 +26,11 @@ Historical page implementations, lesson data, plans and audio remain in the repo
 TypeScript and the production build pass. All 44 narration assets were checked against the text catalog. Headless Chrome exercised every chapter and moment on both routes at 1440, 390, and 320px without horizontal page overflow or browser exceptions. Real MP3 playback, pause/resume, speed changes, automatic beat/chapter progression, altered-certificate failure/restore, and reduced-motion transforms passed. Desktop and mobile screenshots were inspected. Subjective listening quality was not assessed; public deployment is not part of this change.
 
 Additional action-scene checks passed: narrated key creation, changing CSR coordinates with playback, signature reveal, exact frozen scene markup while paused, and preservation of the private/public trust distinction. No voice clips were regenerated for this visual-only update.
+
+## Final finishing pass
+
+- Consistent Server 1 / Server 2 names and server icons throughout private close-ups; Server / Browser throughout public close-ups.
+- Public introduction previews now use the public actors and trust configuration.
+- Read-along sentence boundaries preserve filenames and hostnames.
+- Starting narration after selecting a moment begins at that moment and continues the journey.
+- TypeScript compilation and the production build passed after these changes. No additional browser tests were run in this pass; the browser results above describe the earlier revision.

@@ -1,0 +1,42 @@
+{
+  "duration": 19.433333333333334,
+  "fps": 30,
+  "shots": [
+    {
+      "index": 0,
+      "start": 0,
+      "duration": 3.0,
+      "narration": "What makes a server trustworthy?"
+    },
+    {
+      "index": 1,
+      "start": 3.0,
+      "duration": 3.0,
+      "narration": "It creates its own private key."
+    },
+    {
+      "index": 2,
+      "start": 6.0,
+      "duration": 3.1333333333333333,
+      "narration": "A request goes to the certificate authority."
+    },
+    {
+      "index": 3,
+      "start": 9.133333333333333,
+      "duration": 3.1666666666666665,
+      "narration": "The authority signs the server's certificate."
+    },
+    {
+      "index": 4,
+      "start": 12.299999999999999,
+      "duration": 3.3333333333333335,
+      "narration": "The client checks it against a trusted issuer."
+    },
+    {
+      "index": 5,
+      "start": 15.633333333333333,
+      "duration": 3.8,
+      "narration": "See trust happen. Explore the full story."
+    }
+  ]
+}

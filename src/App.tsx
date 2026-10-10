@@ -18,6 +18,7 @@ function Story({ publicCA }: { publicCA: boolean }) {
   const [frame, setFrame] = useState({ beat: 0, progress: 0 });
   const [mode, setMode] = useState<'preview' | 'audio' | 'still'>('still');
   const [changed, setChanged] = useState(false);
+  const [audioOffset, setAudioOffset] = useState(0);
   const previewTime = useRef(0);
   const running = useRef(false);
   const storyRef = useRef<HTMLElement>(null);
@@ -25,14 +26,15 @@ function Story({ publicCA }: { publicCA: boolean }) {
   const id = `${publicCA ? 'public' : 'private'}-${step}`;
   const activeAudio = speech.state.id === id && mode === 'audio';
   const beats = scenes[step];
-  const beatIndex = activeAudio ? Math.max(0, speech.state.part - 1) : frame.beat;
+  const beatIndex = activeAudio ? audioOffset + Math.max(0, speech.state.part - 1) : frame.beat;
   const beat = beats[beatIndex] ?? beats[0];
   const progress = frame.beat === beatIndex ? frame.progress : 0;
   const last = step === scenes.length - 1;
   const foundation = step < foundationScenes.length;
   const totalMoments = scenes.reduce((total, scene) => total + scene.length, 0);
   const completedMoments = scenes.slice(0, step).reduce((total, scene) => total + scene.length, 0) + beatIndex + progress;
-  const captionSentences = beat.narration.match(/[^.!?]+[.!?]+(?:[”’])?|[^.!?]+$/g)?.map(sentence => sentence.trim()) ?? [beat.narration];
+  // A period within ca.crt or a hostname is not a sentence boundary.
+  const captionSentences = beat.narration.split(/(?<=[.!?])\s+/);
   const captionPosition = progress * beat.narration.length;
   let captionCursor = 0;
   const currentSentence = captionSentences.findIndex((sentence, index) => { captionCursor += sentence.length + 1; return captionPosition < captionCursor || index === captionSentences.length - 1; });
@@ -48,7 +50,7 @@ function Story({ publicCA }: { publicCA: boolean }) {
       if (mode === 'preview') previewTime.current += delta;
       if (now - paint > 40) {
         paint = now;
-        if (mode === 'audio' && activeAudio) setFrame({ beat: Math.max(0, speech.state.part - 1), progress: speech.getProgress() });
+        if (mode === 'audio' && activeAudio) setFrame({ beat: audioOffset + Math.max(0, speech.state.part - 1), progress: speech.getProgress() });
         if (mode === 'preview') {
           const position = previewTime.current / 8500;
           if (position >= beats.length) { setFrame({ beat: beats.length - 1, progress: 1 }); setMode('still'); return; }
@@ -59,17 +61,17 @@ function Story({ publicCA }: { publicCA: boolean }) {
     };
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
-  }, [mode, activeAudio, speech.state.part, speech.getProgress, beats.length, step]);
+  }, [mode, activeAudio, audioOffset, speech.state.part, speech.getProgress, beats.length, step]);
 
   const finish = () => { running.current = false; setMode('still'); };
   const jump = (next: number, moment = 0) => {
     speech.stop(); running.current = false; setChanged(false);
     setStep(next); setFrame({ beat: moment, progress: 0 }); previewTime.current = moment * 8500; setMode('preview');
   };
-  const startAudio = (index: number) => {
+  const startAudio = (index: number, moment = 0) => {
     if (!running.current) return;
-    setStep(index); setFrame({ beat: 0, progress: 0 }); setMode('audio');
-    speech.speak(scenes[index].map(cue => cue.narration), {
+    setStep(index); setAudioOffset(moment); setFrame({ beat: moment, progress: 0 }); setMode('audio');
+    speech.speak(scenes[index].slice(moment).map(cue => cue.narration), {
       id: `${publicCA ? 'public' : 'private'}-${index}`, label: `${publicCA ? 'Public' : 'Private'} CA · ${labels[index]}`,
       onCancel: finish,
       onEnd: () => {
@@ -81,7 +83,8 @@ function Story({ publicCA }: { publicCA: boolean }) {
   };
   const listen = () => {
     if (activeAudio) { if (speech.state.status === 'paused') speech.resume(); else speech.pause(); return; }
-    speech.stop(); setChanged(false); running.current = true; startAudio(step);
+    speech.stop(); setChanged(false); running.current = true;
+    startAudio(step, progress >= 1 && beatIndex === beats.length - 1 ? 0 : beatIndex);
     storyRef.current?.scrollIntoView({ behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth', block: 'start' });
   };
   const toggleVisuals = () => {
@@ -101,7 +104,7 @@ function Story({ publicCA }: { publicCA: boolean }) {
     <nav className="journey-steps" aria-label="Choose a step">{labels.map((label, index) => <button key={label} aria-current={step === index ? 'step' : undefined} onClick={() => jump(index)}><span>{String(index + 1).padStart(2, '0')}</span>{label}</button>)}</nav>
     <div className="scene-toolbar"><div><span className="eyebrow">STEP {step + 1} OF {scenes.length}</span><h2>{labels[step]}</h2></div><div className="play-actions"><button className="primary-play" onClick={listen} disabled={!speech.supported || (activeAudio && speech.state.status === 'loading')}><SpeakerIcon/>{activeAudio ? speech.state.status === 'loading' ? 'Loading audio…' : speech.state.status === 'paused' ? 'Resume narration' : 'Pause narration' : 'Play with voice'}</button><button className="visual-toggle" onClick={toggleVisuals}><LineIcon kind={mode === 'preview' ? 'pause' : 'play'} size={16}/>{mode === 'preview' ? 'Pause visuals' : 'Watch without voice'}</button></div></div>
     <div className="moment-track" aria-label="Moments in this step">{beats.map((cue, i) => <button key={cue.label} onClick={() => jump(step, i)} aria-current={i === beatIndex ? 'step' : undefined}><span className="moment-fill" style={{ width: `${i < beatIndex ? 100 : i === beatIndex ? progress * 100 : 0}%` }}/><span>{i + 1}. {cue.label}</span></button>)}</div>
-    {foundation ? <FoundationScene beat={beat} progress={progress} moving={moving}/> : <FlowScene beat={beat} beatIndex={beatIndex} progress={progress} step={step - foundationScenes.length} publicCA={publicCA} changed={changed} moving={moving}/>}
+    {foundation ? <FoundationScene beat={beat} progress={progress} moving={moving} publicCA={publicCA}/> : <FlowScene beat={beat} beatIndex={beatIndex} progress={progress} step={step - foundationScenes.length} publicCA={publicCA} changed={changed} moving={moving}/>}
     <div className="spoken-caption"><div><span className={`narration-dot ${moving ? 'narration-active' : ''}`}/><strong>{activeAudio ? speech.state.status === 'paused' ? 'NARRATION PAUSED' : 'FOLLOW THE VOICE' : 'READ ALONG'}</strong><span>{beatIndex + 1} / {beats.length}</span></div><p>{changed ? changedCertificate : captionSentences.map((sentence, index) => <span className={index === currentSentence ? 'caption-current' : ''} key={`${beat.label}-${index}`}>{sentence} </span>)}</p></div>
     <div className="whole-journey-progress" role="progressbar" aria-label="Lesson progress" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(completedMoments / totalMoments * 100)}><span style={{ width: `${completedMoments / totalMoments * 100}%` }}/></div>
     <div className="scene-controls"><button onClick={() => jump(step - 1)} disabled={step === 0}>Previous step</button><button className="replay-control" onClick={() => jump(step)}>Replay this step</button><span>{mode === 'audio' ? 'The voice guides the whole journey.' : 'Explore a moment above, or play with voice.'}</span><button className="next-step" onClick={() => jump(last ? 0 : step + 1)}>{last ? 'Start from the beginning' : 'Next step'}</button></div>

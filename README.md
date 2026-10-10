@@ -38,6 +38,8 @@ The **What is a CA?** screen now plays miniature action scenes inside the illust
 
 Use the step buttons or moment buttons to explore silently, pause visuals, or replay. Without audio, moments preview for 8.5 seconds each and stop at the end of the selected step. An optional altered-certificate experiment demonstrates signature failure. Reduced-motion preferences replace travelling-file motion with discrete source/destination states.
 
+After choosing a moment, **Play with voice** begins at that moment and continues through the remaining journey. File names such as `ca.crt` stay intact in the read-along captions. Close-ups use the same Server 1/Server 2 or Server/Browser labels as the network diagram.
+
 The private example follows one connection between two servers; private TLS is not limited to two machines. Server 1 acts as the client. The public example distinguishes server certificate, intermediate chain, and the browser’s already trusted root. No Gitaly-specific context is required.
 
 ## Audio
